@@ -27,6 +27,8 @@
     if ($result = mysqli_query($conn,$sql))
         $donorSum = mysqli_num_rows($result);
 
+    include 'add_donor.php';
+
     mysqli_close($conn);
 ?>
 
@@ -61,7 +63,7 @@
             onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
         <button class="w3-bar-item w3-right w3-button"
             onclick="window.location.href='./index.php';"><i class="fa fa-sign-out"></i></button>
-        <span class="w3-bar-item w3-hide-medium">Blood Donation Management System</span>
+        <span class="w3-bar-item w3-hide-small">Blood Donation Management System</span>
     </div>
 
     <!-- Sidebar/menu -->
@@ -92,54 +94,7 @@
 
     <!-- !PAGE CONTENT! -->
     <div class="w3-main" style="margin-left:300px;margin-top:43px;">
-
-        <!-- Header -->
-        <header class="w3-container" style="padding-top:22px">
-            <h5><b><i class="fa fa-dashboard"></i> My Dashboard</b></h5>
-        </header>
-
-        <div class="w3-row-padding w3-margin-bottom">
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-red w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-user w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3><?php echo $donorSum ?></h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Donor</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-blue w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-eye w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>99</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Views</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-teal w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-share-alt w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>23</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Shares</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-orange w3-text-white w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>50</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Users</h4>
-                </div>
-            </div>
-        </div>
+        <?php include "header.php" ?>
 
         <div class="w3-container">
             <h5><b><i class="fa fa-file-text-o"></i> New Donor Registration</b></h5>
@@ -150,30 +105,30 @@
                 <form class="w3-row-padding" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
                     <div class="w3-half w3-padding-16">
                         <label>First Name</label>
-                        <input class="w3-input" type="text" required>
+                        <input class="w3-input" name="donorFN" type="text" required>
                     </div>
                     <div class="w3-half w3-padding-16">
                         <label>Last Name</label>
-                        <input class="w3-input" type="text" required>
+                        <input class="w3-input" name="donorLN" type="text" required>
                     </div>
                     <div class="w3-quarter w3-padding-16">
                         <label>Weight</label>
-                        <input class="w3-input" type="text" required>
+                        <input class="w3-input" name="donorWeight" type="text" required>
                     </div>
                     <div class="w3-quarter w3-padding-16">
                         <label>Age</label>
-                        <input class="w3-input" type="text" required>
+                        <input class="w3-input" name="donorAge" type="text" required>
                     </div>
                     <div class="w3-quarter w3-padding-16">
                         <label>Sex</label>
-                        <select class="w3-select" name="sex" required>
+                        <select class="w3-select" name="donorSex" required>
                             <option value="male" selected>Male</option>
                             <option value="female">Female</option>
                         </select>
                     </div>
                     <div class="w3-quarter w3-padding-16">
                         <label>Blood Type</label>
-                        <select class="w3-select" name="bloodtype" required>
+                        <select class="w3-select" name="donorbloodtype" required>
                             <option value="1" selected>A+</option>
                             <option value="2">A-</option>
                             <option value="3">B+</option>
@@ -186,19 +141,19 @@
                     </div>
                     <div class="w3-row-padding w3-padding-16">
                         <label>Home Address</label>
-                        <input class="w3-input" type="text" required>
+                        <input class="w3-input" name="donorAddress" type="text" required>
                     </div>
                     <div class="w3-twothird w3-padding-16">
                         <label>Identity Card No / Passport No</label>
-                        <input class="w3-input" type="text" required>
+                        <input class="w3-input" name="donorIC" type="text" required>
                     </div>
                     <div class="w3-third w3-padding-16">
                         <label>Phone No</label>
-                        <input class="w3-input" type="text" required>
+                        <input class="w3-input" name="donorPhone" type="text" required>
                     </div>
                     <div class="w3-half w3-padding-16">
                         <label>Email</label>
-                        <input class="w3-input" type="text" required>
+                        <input class="w3-input" name="donorEmail" type="text" required>
                     </div>
                     <div class="w3-half w3-padding-16">
                         <label>Nationality</label>
@@ -209,7 +164,7 @@
                     </div>
                     <div class="w3-row-padding">
                         <b><input type="submit" class="w3-btn w3-block w3-round w3-green"
-                                value="Add New Donor"></input></b>
+                                name="addDonor" value="addDonor"></input></b>
                     </div>
                     <br>
                 </form>

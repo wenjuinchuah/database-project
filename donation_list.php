@@ -50,6 +50,10 @@
         h5 {
             font-family: Arial, Helvetica, sans-serif
         }
+
+        .w3-padding-0 {
+            padding: 0
+        }
     </style>
 </head>
 
@@ -61,7 +65,7 @@
             onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
         <button class="w3-bar-item w3-right w3-button" onclick="window.location.href='./index.php';"><i
                 class="fa fa-sign-out"></i></button>
-        <span class="w3-bar-item w3-hide-medium">Blood Donation Management System</span>
+        <span class="w3-bar-item w3-hide-small">Blood Donation Management System</span>
     </div>
 
     <!-- Sidebar/menu -->
@@ -96,93 +100,53 @@
 
     <!-- !PAGE CONTENT! -->
     <div class="w3-main" style="margin-left:300px;margin-top:43px;">
-
-        <!-- Header -->
-        <header class="w3-container" style="padding-top:22px">
-            <h5><b><i class="fa fa-dashboard"></i> My Dashboard</b></h5>
-        </header>
-
-        <div class="w3-row-padding w3-margin-bottom">
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-red w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-user w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3><?php echo $donorSum ?></h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Donor</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-blue w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-eye w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>99</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Views</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-teal w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-share-alt w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>23</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Shares</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-orange w3-text-white w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>50</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Users</h4>
-                </div>
-            </div>
-        </div>
+        <?php include "header.php" ?>
 
         <div class="w3-container">
             <h5><b><i class="fa fa-file-text-o"></i> Donation List</b></h5>
-            <input class="w3-input w3-border w3-padding" type="text"
-                placeholder="Currently available to filter 1 category (IC No)" id="myInput" onkeyup="myFunction()">
-
+            
+            <div class="w3-panel w3-padding-0 w3-row">
+                <select class="w3-select w3-border w3-quarter w3-row-padding" style="margin-right:16px; height:40.5px" id="sort" name="filter" onchange="clearInput()">
+                    <option value="" disabled selected>Sort by</option>
+                </select>
+                <div class="w3-rest">
+                    <input class="w3-input w3-border w3-rest" type="text"
+                    placeholder="Search" id="myInput" onkeyup="filter()">
+                </div>
+            </div>
+            
             <br>
             <div class="w3-card-4 w3-white">
                 <div class="w3-responsive">
                     <table class="w3-table-all" id="myTable">
                         <tr class="w3-dark-grey">
-                            <th>Name</th>
-                            <th>IC/Passport No</th>
-                            <th>Weight</th>
-                            <th>Age</th>
-                            <th>Sex</th>
-                            <th>Phone No</th>
-                            <th>Nationality</th>
-                            <th>Last Donation</th>
-                            <th>Frequency</th>
-                            <th></th>
+                            <th>Donation List ID</th>
+                            <th>Hemoglobin Level</th>
+                            <th>Blood Donation Type</th>
+                            <th>Fluid Volume</th>
+                            <th>Donation Date</th>
+                            <th>Donor Name</th>
+                            <th>Blood Type</th>
                         </tr>
                         <?php
                             include 'connect.php';
                             $counter = 0;
-                            $sql = "SELECT * FROM donor";
+                            $sql = "SELECT donation_list.DonationListID, donation_list.HemoglobinLevel, donation_list.BloodDonationType, donation_list.FluidVolume, donation_list.DonationDate, donor.DonorName, donor.BloodType
+                                    FROM donation_list
+                                    LEFT JOIN donor
+                                    ON donation_list.DonorID=donor.DonorID
+                                    ORDER BY donation_list.DonationListID;";
                             $result = mysqli_query($conn, $sql);
                             while ($row = mysqli_fetch_array($result)) {
+                                $row[2] = ($row[2] == 'W') ? "Whole" : "Apheresis";
                                 echo "<tr>";
+                                echo "<td>$row[0]</td>";
                                 echo "<td>$row[1]</td>";
                                 echo "<td>$row[2]</td>";
                                 echo "<td>$row[3]</td>";
                                 echo "<td>$row[4]</td>";
                                 echo "<td>$row[5]</td>";
-                                echo "<td>+60$row[6]</td>";
-                                echo "<td>$row[9]</td>";
-                                echo "<td>$row[10]</td>";
-                                echo "<td>$row[11]</td>";
-                                echo '<td><button onclick="document.getElementById("id0' . ++$counter . '").style.display="none"" class="w3-btn w3-round-large w3-teal">Edit</button></td>';
+                                echo "<td>$row[6]</td>";
                                 echo "</tr>";
                             }
                             mysqli_close($conn);
@@ -239,16 +203,18 @@
         }
 
         // Filter
-        function myFunction() {
-            var input, filter, table, tr, td, i;
+        function filter() {
+            var input, filter, table, tr, td, i, sort;
             input = document.getElementById("myInput");
             filter = input.value.toUpperCase();
             table = document.getElementById("myTable");
             tr = table.getElementsByTagName("tr");
+            sort = document.getElementById("sort");
+            console.log(sort.selectedIndex);
 
             for (i = 0; i < tr.length; i++) {
                 // To filter different category ("td")[change me]
-                td = tr[i].getElementsByTagName("td")[1];
+                td = tr[i].getElementsByTagName("td")[sort.selectedIndex - 1];
 
                 if (td) {
                     txtValue = td.textContent || td.innerText;
@@ -259,6 +225,33 @@
                         tr[i].style.display = "none";
                     }
                 }
+            }
+        }
+
+        // Sort by
+        window.onload = function sortBy() {
+            var input, table, tr, th, i;
+            input = document.getElementById("sort");
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+            th = tr[0].getElementsByTagName("th");
+            for (i = 0; i < th.length; i++) {
+                const option = document.createElement("option");
+                option.value = th[i].textContent;
+                option.innerHTML = th[i].textContent;
+                document.getElementById("sort").appendChild(option);
+            }
+        }
+
+        // Clear Input
+        function clearInput() {
+            var input, sort;
+            input = document.getElementById("myInput");
+            sort = document.getElementById("sort");
+
+            if (sort.selectedIndex) {
+                input.value = "";
+                filter();
             }
         }
     </script>

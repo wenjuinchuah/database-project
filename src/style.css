@@ -1,0 +1,69 @@
+.regform {
+    width: 400px;
+    margin: 100px auto;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    max-height:500px;
+    max-width:420px;
+    overflow:auto;
+}
+
+.userView-container {
+    height:100px;
+    justify-content: center;
+    align-content: center;
+}
+
+#deleteDonorView {
+background-color: #d3d3d3a0;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+} */
+
+/* .regform h2 {
+    text-align: center;
+    padding: 10px;
+}
+
+.regform div {
+    margin: 0px 10px 0px;
+    padding-bottom: 10px;
+}
+
+.regform label {
+    padding: 10px 0;
+}
+
+.regform small {
+    font-size: 12px;
+    padding-left: 5px;
+    color: red;
+    visibility: hidden;
+    font-weight: bold;
+}
+
+.regform input, .regform select {
+    display: block;
+    width: 100%;
+    height: 30px;
+    padding: 0 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid lightgray;
+    background-color: #f1f1f1;
+}
+
+.regform .button {
+    margin: 15px 10px;
+}
+
+.regform .button input {
+    display: inline-block;
+    height: 32px;
+}

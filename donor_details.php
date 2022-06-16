@@ -20,6 +20,8 @@
         }
     }
 
+    include 'delete_donor.php';
+
     // Get Donor Sum
     $donorSum = 0;
     $sql = "SELECT * FROM donor";
@@ -38,6 +40,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- <link rel="stylesheet" href="src/style.css"> -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
@@ -50,6 +53,10 @@
         h5 {
             font-family: Arial, Helvetica, sans-serif
         }
+
+        .w3-padding-0 {
+            padding: 0;
+        }
     </style>
 </head>
 
@@ -61,7 +68,7 @@
             onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
         <button class="w3-bar-item w3-right w3-button" onclick="window.location.href='./index.php';"><i
                 class="fa fa-sign-out"></i></button>
-        <span class="w3-bar-item w3-hide-medium">Blood Donation Management System</span>
+        <span class="w3-bar-item w3-hide-small">Blood Donation Management System</span>
     </div>
 
     <!-- Sidebar/menu -->
@@ -84,7 +91,8 @@
                     class="fa fa-file-text-o fa-fw"></i>  Donor Registration</a>
             <a href="./donor_details.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding w3-teal"><i
                     class="fa fa-eye fa-fw"></i>  Donor Details</a>
-            <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i class="fa fa-users fa-fw"></i>  Donation
+            <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i
+                    class="fa fa-users fa-fw"></i>  Donation
                 List</a><br><br>
         </div>
     </nav>
@@ -96,59 +104,21 @@
 
     <!-- !PAGE CONTENT! -->
     <div class="w3-main" style="margin-left:300px;margin-top:43px;">
-
-        <!-- Header -->
-        <header class="w3-container" style="padding-top:22px">
-            <h5><b><i class="fa fa-dashboard"></i> My Dashboard</b></h5>
-        </header>
-
-        <div class="w3-row-padding w3-margin-bottom">
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-red w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-user w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3><?php echo $donorSum ?></h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Donor</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-blue w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-eye w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>99</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Views</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-teal w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-share-alt w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>23</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Shares</h4>
-                </div>
-            </div>
-            <div class="w3-quarter">
-                <div class="w3-container w3-round-large w3-orange w3-text-white w3-padding-16">
-                    <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
-                    <div class="w3-right">
-                        <h3>50</h3>
-                    </div>
-                    <div class="w3-clear"></div>
-                    <h4>Users</h4>
-                </div>
-            </div>
-        </div>
+        <?php include "header.php" ?>
 
         <div class="w3-container">
             <h5><b><i class="fa fa-file-text-o"></i> All Donor Details</b></h5>
-            <input class="w3-input w3-border w3-padding" type="text"
-                placeholder="Currently available to filter 1 category (IC No)" id="myInput" onkeyup="myFunction()">
+
+            <div class="w3-panel w3-padding-0 w3-row">
+                <select class="w3-select w3-border w3-quarter w3-row-padding" style="margin-right:16px; height:40.5px"
+                    id="sort" name="filter" onchange="clearInput()">
+                    <option value="" disabled selected>Sort by</option>
+                </select>
+                <div class="w3-rest">
+                    <input class="w3-input w3-border" type="text" placeholder="Search" id="myInput"
+                        onkeyup="filter()">
+                </div>
+            </div>
 
             <br>
             <div class="w3-card-4 w3-white">
@@ -164,6 +134,7 @@
                             <th>Nationality</th>
                             <th>Last Donation</th>
                             <th>Frequency</th>
+                            <th></th>
                             <th></th>
                         </tr>
                         <?php
@@ -182,7 +153,8 @@
                                 echo "<td>$row[9]</td>";
                                 echo "<td>$row[10]</td>";
                                 echo "<td>$row[11]</td>";
-                                echo '<td><button onclick="document.getElementById("id0' . ++$counter . '").style.display="none"" class="w3-btn w3-round-large w3-teal">Edit</button></td>';
+                                echo "<td><button onclick=onEdit($row[0]) class=\"w3-btn w3-round w3-teal\">Edit</button></td>";
+                                echo "<td><button onclick=onDelete($row[0]) class=\"w3-btn w3-round w3-teal\">Delete</button></td>";
                                 echo "</tr>";
                             }
                             mysqli_close($conn);
@@ -190,21 +162,43 @@
                     </table>
                 </div>
 
-                <!-- Modal -->
-                <div id=" id01" class="w3-modal">
+                <!-- Edit Modal -->
+                <div id="editDonorModal" class="w3-modal">
                     <div class="w3-modal-content w3-card-4 w3-animate-top">
-                        <header class="w3-container w3-teal">
-                            <span onclick="document.getElementById('id01').style.display='none'"
-                                class="w3-button w3-display-topright">&times;</span>
-                            <h2>Modal Header</h2>
+                        <header class="w3-container w3-dark-gray">
+                            <span onclick="document.getElementById('editDonorModal').style.display='none'"
+                                class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
+                            <h2>Edit Donor Details</h2>
                         </header>
                         <div class="w3-container">
-                            <p>Some text..</p>
-                            <p>Some text..</p>
+                            <?php //test
+                            include 'testing.php'?>
                         </div>
-                        <footer class="w3-container w3-teal">
-                            <p>Modal Footer</p>
-                        </footer>
+                    </div>
+                </div>
+
+                <!-- Delete Modal-->
+                <div id="deleteDonorModal" class="w3-modal">
+                    <div class="w3-modal-content w3-card-4 w3-animate-top">
+                        <header class="w3-container w3-dark-gray">
+                            <span onclick="document.getElementById('deleteDonorModal').style.display='none'"
+                                class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
+                            <h2>Delete Donor</h2>
+                        </header>
+                        <div class="w3-container" style="text-align:center;">
+                            <form class='w3-padding-24 w3-panel' action="" method="POST">
+                                <i class="fa fa-exclamation-triangle w3-xxxlarge" style="color: rgb(230, 89, 84)"></i>
+                                <input type="hidden" id="deleteID" name="deleteID">
+                                <div class="w3-panel">
+                                    <h4>Data can't be restored once deleted. </h4>
+                                    <h4>Are you sure?</h4>
+                                </div>
+                                <div class="w3-row-padding" style="margin: auto; width: 50%">
+                                    <b><input type="submit" class="w3-btn w3-block w3-round w3-red" name="delete"
+                                            value="Confirm"></input></b>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -214,6 +208,8 @@
         <!-- End page content -->
     </div>
 
+    <!-- import jquery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
         // Get the Sidebar
         var mySidebar = document.getElementById("mySidebar");
@@ -239,16 +235,18 @@
         }
 
         // Filter
-        function myFunction() {
-            var input, filter, table, tr, td, i;
+        function filter() {
+            var input, filter, table, tr, td, i, sort;
             input = document.getElementById("myInput");
             filter = input.value.toUpperCase();
             table = document.getElementById("myTable");
             tr = table.getElementsByTagName("tr");
+            sort = document.getElementById("sort");
+            // console.log(sort.selectedIndex);
 
             for (i = 0; i < tr.length; i++) {
                 // To filter different category ("td")[change me]
-                td = tr[i].getElementsByTagName("td")[1];
+                td = tr[i].getElementsByTagName("td")[sort.selectedIndex - 1];
 
                 if (td) {
                     txtValue = td.textContent || td.innerText;
@@ -259,6 +257,45 @@
                         tr[i].style.display = "none";
                     }
                 }
+            }
+        }
+
+        // delete button (need this to pass the id, cuz we not displaying id in the table right now)
+        function onDelete(id){
+            document.getElementById("deleteDonorModal").style.display="block";
+            $('#deleteID').val(id);
+        }
+
+        // edit button
+        function onEdit(id){ // note to self: table dont show all detail, have to grab from db
+            document.getElementById("editDonorModal").style.display="block";
+            $('#editID').val(id);
+        }
+
+        // Sort by
+        window.onload = function sortBy() {
+            var input, table, tr, th, i;
+            input = document.getElementById("sort");
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+            th = tr[0].getElementsByTagName("th");
+            for (i = 0; i < th.length - 1; i++) {
+                const option = document.createElement("option");
+                option.value = th[i].textContent;
+                option.innerHTML = th[i].textContent;
+                document.getElementById("sort").appendChild(option);
+            }
+        }
+
+        // Clear Input
+        function clearInput() {
+            var input, sort;
+            input = document.getElementById("myInput");
+            sort = document.getElementById("sort");
+
+            if (sort.selectedIndex) {
+                input.value = "";
+                filter();
             }
         }
     </script>
