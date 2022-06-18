@@ -39,6 +39,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         html,
@@ -121,9 +122,9 @@
                     </div>
                     <div class="w3-half w3-padding-16">
                         <label>Date</label>
-                        <input class="w3-input" type="date" name="date" required>
+                        <input class="w3-input" type="date" name="date" value="<?php echo date('Y-m-d'); ?>" required>
                     </div>
-                    <div class="w3-row-padding w3-padding-16">
+                    <div class="w3-third w3-padding-16">
                         <label>Donation Type</label>
                         <select class="w3-select" name="donationtype" required>
                             <option value="W" selected>Whole Blood</option>
@@ -131,17 +132,18 @@
                         </select>
                     </div>
                     
-                    <div class="w3-half w3-padding-16">
+                    <div class="w3-third w3-padding-16">
                         <label>Location  Type</label>
-                        <select class="w3-select" name="locationtype" required>
+                        <select class="w3-select" name="locationtype" id="locationType" onchange="showLocation()" required>
                             <option value="B" selected>Blood Bank</option>
                             <option value="L">Local Health Centre</option>
                             <option value="M">Mobility Programme</option>
-                        </select>         
+                        </select>
                     </div>
-                    <div class="w3-half w3-padding-16">
+                    <div class="w3-third w3-padding-16">
                         <label>Location ID</label>
-                        <input class="w3-input" type="text" name="locationid" required>          
+                        <select class="w3-select" type="text" name="locationid" id="location" required>
+                        </select>          
                     </div>
                     <div class="w3-half w3-padding-16">
                         <label>Hemoglobin Level (g/dL)</label>
@@ -175,7 +177,27 @@
         <!-- End page content -->
     </div>
 
+    <?php
+        include 'connect.php';
+        $counter = 0;
+        $tableList = ['B', 'L', 'M'];
 
+        foreach ($tableList as $i) {
+            echo '<table class="w3-table-all" id="'.$i.'" style="display: none">';    
+            $i = ($i == 'B') ? 'blood_bank' : (($i == 'L') ? 'local_health_centre' : 'mobile_blood_donation_program');
+            $sql = "SELECT * FROM $i";
+            $result = mysqli_query($conn, $sql);
+
+            while ($row = mysqli_fetch_array($result)) {
+                echo "<tr>";
+                echo "<td>$row[1]</td>";
+                echo "<td>$row[2]</td>";
+                echo "</tr>";
+            }
+            echo '</table>';
+        }
+        mysqli_close($conn);
+    ?>
     
 
     <script>
@@ -200,6 +222,38 @@
         function w3_close() {
             mySidebar.style.display = "none";
             overlayBg.style.display = "none";
+        }
+
+        // Check LocationType
+        window.onload = function () {
+            updateLocation();
+        }
+
+        // Update Location
+        function updateLocation() {
+            var input, location, table, tr, td, i;
+            input = document.getElementById("locationType");
+            location = document.getElementById("location");
+            table = document.getElementById(input.value);
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td");
+                const option = document.createElement("option");
+                option.value = td[0].textContent;
+                option.innerHTML = td[0].textContent + " - " + td[1].textContent;
+                document.getElementById("location").appendChild(option);
+            }
+        }
+
+        // Show Location
+        function showLocation() {
+            var i, input;
+            input = document.getElementById("location");
+            for(i = input.options.length; i >= 0; i--) {
+                input.remove(i);
+            }
+            updateLocation();
         }
     </script>
 

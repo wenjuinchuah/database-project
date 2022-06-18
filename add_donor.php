@@ -2,7 +2,7 @@
     if (isset($_POST['addDonor'])){
         $fname = $_POST['donorFN'];
         $lname = $_POST['donorLN'];
-        $name = $fname.$lname;
+        $name = $fname." ".$lname;
         $weight = $_POST['donorWeight'];
         $age = $_POST['donorAge'];
         $sex = $_POST['donorSex'];
@@ -21,7 +21,7 @@
 
             $sql = "INSERT INTO donor(DonorID, DonorName, `DonorIC/Passport_No`, DonorWeight, DonorAge, 
             DonorSex, DonorPhoneNo, DonorAddress, DonorEmail, DonorNationality) 
-            VALUES('$id', '$fname.$lname', '$ic', '$weight', '$age', '$sex', '$phone', '$address', '$email', '$nationality')";
+            VALUES('$id', '$name', '$ic', '$weight', '$age', '$sex', '$phone', '$address', '$email', '$nationality')";
             if(!mysqli_query($conn, $sql)){
                 echo "Error: " . $sql . "<br>" . $conn->error;
             }

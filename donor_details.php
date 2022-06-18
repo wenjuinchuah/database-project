@@ -29,6 +29,8 @@
     if ($result = mysqli_query($conn,$sql))
         $donorSum = mysqli_num_rows($result);
 
+    include 'edit_donor.php';
+
     mysqli_close($conn);
 ?>
 
@@ -42,6 +44,7 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <!-- <link rel="stylesheet" href="src/style.css"> -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         html,
@@ -58,10 +61,11 @@
             padding: 0;
         }
     </style>
+
 </head>
 
 <body class="w3-light-grey">
-
+    
     <!-- Top container -->
     <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
         <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey"
@@ -170,9 +174,8 @@
                                 class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
                             <h2>Edit Donor Details</h2>
                         </header>
-                        <div class="w3-container">
-                            <?php //test
-                            include 'testing.php'?>
+                        <div class="w3-container" id="editform" >
+                            <?php include 'edit_form.php'?> <!-- this one no need deliberately put it in php also can one, i just trying something that time-->
                         </div>
                     </div>
                 </div>
@@ -260,16 +263,31 @@
             }
         }
 
-        // delete button (need this to pass the id, cuz we not displaying id in the table right now)
+        //delete button (need this to pass the id, cuz we not displaying id in the table right now)
         function onDelete(id){
             document.getElementById("deleteDonorModal").style.display="block";
             $('#deleteID').val(id);
         }
 
         // edit button
-        function onEdit(id){ // note to self: table dont show all detail, have to grab from db
+        function onEdit(id){
             document.getElementById("editDonorModal").style.display="block";
-            $('#editID').val(id);
+            $.get( "fetch_donor.php", {donorID: id}, function( data ) {
+                $("[name = 'donorFN']").val(data.fname);
+                $("[name = 'donorLN']").val(data.lname);
+                $("[name = 'donorWeight']").val(data.weight);
+                $("[name = 'donorAge']").val(data.age);
+                $("[name = 'donorSex']").val(data.sex);
+                $("[name = 'donorbloodtype']").val(data.bloodtype);
+                $("[name = 'donorAddress']").val(data.address);
+                $("[name = 'donorIC']").val(data.ic);
+                $("[name = 'donorPhone']").val(data.phone);
+                $("[name = 'donorEmail']").val(data.email);
+                $("[name = 'nationality']").val(data.nationality);
+                $('#editID').val(id);
+            }, "json").fail(function() {
+                alert( "error" );
+            });
         }
 
         // Sort by
@@ -278,7 +296,7 @@
             input = document.getElementById("sort");
             table = document.getElementById("myTable");
             tr = table.getElementsByTagName("tr");
-            th = tr[0].getElementsByTagName("th");
+            th = tr[0].getElementsByTagName("th"); 
             for (i = 0; i < th.length - 1; i++) {
                 const option = document.createElement("option");
                 option.value = th[i].textContent;

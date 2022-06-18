@@ -39,6 +39,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         html,
@@ -114,62 +115,18 @@
                     placeholder="Search" id="myInput" onkeyup="filter()">
                 </div>
             </div>
+
+            <div class="w3-container">
+                <div class="w3-right">
+                    <button onclick=month() class="w3-btn w3-round w3-teal">Monthly</button>
+                    <button onclick=allData() class="w3-btn w3-round w3-teal">All Data</button>
+                </div>
+            </div>
             
             <br>
             <div class="w3-card-4 w3-white">
-                <div class="w3-responsive">
-                    <table class="w3-table-all" id="myTable">
-                        <tr class="w3-dark-grey">
-                            <th>Donation List ID</th>
-                            <th>Hemoglobin Level</th>
-                            <th>Blood Donation Type</th>
-                            <th>Fluid Volume</th>
-                            <th>Donation Date</th>
-                            <th>Donor Name</th>
-                            <th>Blood Type</th>
-                        </tr>
-                        <?php
-                            include 'connect.php';
-                            $counter = 0;
-                            $sql = "SELECT donation_list.DonationListID, donation_list.HemoglobinLevel, donation_list.BloodDonationType, donation_list.FluidVolume, donation_list.DonationDate, donor.DonorName, donor.BloodType
-                                    FROM donation_list
-                                    LEFT JOIN donor
-                                    ON donation_list.DonorID=donor.DonorID
-                                    ORDER BY donation_list.DonationListID;";
-                            $result = mysqli_query($conn, $sql);
-                            while ($row = mysqli_fetch_array($result)) {
-                                $row[2] = ($row[2] == 'W') ? "Whole" : "Apheresis";
-                                echo "<tr>";
-                                echo "<td>$row[0]</td>";
-                                echo "<td>$row[1]</td>";
-                                echo "<td>$row[2]</td>";
-                                echo "<td>$row[3]</td>";
-                                echo "<td>$row[4]</td>";
-                                echo "<td>$row[5]</td>";
-                                echo "<td>$row[6]</td>";
-                                echo "</tr>";
-                            }
-                            mysqli_close($conn);
-                        ?>
-                    </table>
-                </div>
-
-                <!-- Modal -->
-                <div id=" id01" class="w3-modal">
-                    <div class="w3-modal-content w3-card-4 w3-animate-top">
-                        <header class="w3-container w3-teal">
-                            <span onclick="document.getElementById('id01').style.display='none'"
-                                class="w3-button w3-display-topright">&times;</span>
-                            <h2>Modal Header</h2>
-                        </header>
-                        <div class="w3-container">
-                            <p>Some text..</p>
-                            <p>Some text..</p>
-                        </div>
-                        <footer class="w3-container w3-teal">
-                            <p>Modal Footer</p>
-                        </footer>
-                    </div>
+                <div class="w3-responsive" id="donation_list_table">
+                    <?php include 'donation_list_table.php' ?>
                 </div>
             </div>
             <br>
@@ -178,6 +135,8 @@
         <!-- End page content -->
     </div>
 
+    <!-- import jquery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
         // Get the Sidebar
         var mySidebar = document.getElementById("mySidebar");
@@ -201,6 +160,16 @@
             mySidebar.style.display = "none";
             overlayBg.style.display = "none";
         }
+
+        // idk how to name this XD
+        function month() {
+            $( "#donation_list_table" ).load("donation_list_table.php", {type: "month"});
+        }
+
+        function allData() {
+            $( "#donation_list_table" ).load("donation_list_table.php");
+        }
+
 
         // Filter
         function filter() {
