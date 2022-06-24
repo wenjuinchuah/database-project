@@ -1,6 +1,9 @@
 <?php
     include 'connect.php';
 
+    // For the use of Success Modal
+    $action = "";
+
     $empID = $_GET['empID'];
     if (!isset($empID)) {
         echo 'ERROR';
@@ -20,12 +23,8 @@
         }
     }
 
-    // Get Donor Sum
-    $donorSum = 0;
-    $sql = "SELECT * FROM donor";
-
-    if ($result = mysqli_query($conn,$sql))
-        $donorSum = mysqli_num_rows($result);
+    include 'delete_donation_list.php';
+    include 'edit_donation_list.php';
 
     mysqli_close($conn);
 ?>
@@ -89,8 +88,11 @@
                     class="fa fa-file-text-o fa-fw"></i>  Donor Registration</a>
             <a href="./donor_details.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i
                     class="fa fa-eye fa-fw"></i>  Donor Details</a>
-            <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding w3-teal"><i class="fa fa-users fa-fw"></i>  Donation
-                List</a><br><br>
+            <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding w3-teal"><i
+                    class="fa fa-users fa-fw"></i>  Donation
+                List</a>
+            <a href="./report.php" target="_blank" class="w3-bar-item w3-button w3-padding"><i
+                    class="	fa fa-archive fa-fw"></i>  Generate Report</a><br><br>
         </div>
     </nav>
 
@@ -105,14 +107,15 @@
 
         <div class="w3-container">
             <h5><b><i class="fa fa-file-text-o"></i> Donation List</b></h5>
-            
+
             <div class="w3-panel w3-padding-0 w3-row">
-                <select class="w3-select w3-border w3-quarter w3-row-padding" style="margin-right:16px; height:40.5px" id="sort" name="filter" onchange="clearInput()">
+                <select class="w3-select w3-border w3-quarter w3-row-padding" style="margin-right:16px; height:40.5px"
+                    id="sort" name="filter" onchange="clearInput()">
                     <option value="" disabled selected>Sort by</option>
                 </select>
                 <div class="w3-rest">
-                    <input class="w3-input w3-border w3-rest" type="text"
-                    placeholder="Search" id="myInput" onkeyup="filter()">
+                    <input class="w3-input w3-border w3-rest" type="text" placeholder="Search" id="myInput"
+                        onkeyup="filter()">
                 </div>
             </div>
 
@@ -122,7 +125,7 @@
                     <button onclick=allData() class="w3-btn w3-round w3-teal">All Data</button>
                 </div>
             </div>
-            
+
             <br>
             <div class="w3-card-4 w3-white">
                 <div class="w3-responsive" id="donation_list_table">
@@ -130,6 +133,99 @@
                 </div>
             </div>
             <br>
+
+            <!-- Edit Modal -->
+            <div id="editDonationModal" class="w3-modal">
+                <div class="w3-modal-content w3-card-4 w3-animate-top">
+                    <header class="w3-container w3-dark-gray">
+                        <span onclick="document.getElementById('editDonationModal').style.display='none'"
+                            class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
+                        <!-- !TODO -->
+                        <h2>Edit DonationList (WIP)</h2>
+                    </header>
+                    <div class="w3-container" id="editform">
+                        <form class='w3-row-padding' action="" method='POST'>
+                            <input type="hidden" id="editID" name="editID">
+                            <div class='w3-half w3-padding-16'>
+                                <label>Donor Name</label>
+                                <input class='w3-input' name='donorID' type='text' disabled>
+                            </div>
+                            <div class='w3-quarter w3-padding-16'>
+                                <label>Donation Type</label>
+                                <select class='w3-select' name='bloodDonationType' required>
+                                    <option value='W'>Whole</option>
+                                    <option value='A'>Aphresis</option>
+                                </select>
+                            </div>
+                            <div class='w3-quarter w3-padding-16'>
+                                <label>Date</label>
+                                <input class="w3-input" type="date" name="donationDate" required>
+                            </div>
+                            <div class='w3-third w3-padding-16'>
+                                <label>Donation Location</label>
+                                <select class='w3-select' name='donationLocation' required>
+                                    <option value="B" selected>Blood Bank</option>
+                                    <option value="L">Local Health Centre</option>
+                                    <option value="M">Mobility Programme</option>
+                                </select>
+                            </div>
+                            <div class='w3-third w3-padding-16'>
+                                <label>Hemoglobin Level</label>
+                                <input class='w3-input' name='hemoglobinLevel' type='text' required>
+                            </div>
+                            <div class='w3-third w3-padding-16'>
+                                <label>Fluid Volume</label>
+                                <input class='w3-input' name='fluidVolume' type='text' required>
+                            </div>
+                            <div class='w3-row-padding'>
+                                <b><input type='submit' class='w3-btn w3-block w3-round w3-green' id="editDonationList"
+                                        name='editDonationList' value='Edit Donation List'></input></b>
+                            </div>
+                            <br>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Modal-->
+            <div id="deleteDonationModal" class="w3-modal">
+                <div class="w3-modal-content w3-card-4 w3-animate-top">
+                    <header class="w3-container w3-dark-gray">
+                        <span onclick="document.getElementById('deleteDonationModal').style.display='none'"
+                            class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
+                        <h2>Delete Current Donation List</h2>
+                    </header>
+                    <div class="w3-container" style="text-align:center;">
+                        <form class='w3-padding-24 w3-panel' action="" method="POST">
+                            <i class="fa fa-exclamation-triangle w3-xxxlarge" style="color: rgb(230, 89, 84)"></i>
+                            <input type="hidden" id="deleteID" name="deleteID">
+                            <div class="w3-panel">
+                                <h4>Data can't be restored once deleted. </h4>
+                                <h4>Are you sure?</h4>
+                            </div>
+                            <div class="w3-row-padding" style="margin: auto; width: 50%">
+                                <b><input type="submit" class="w3-btn w3-block w3-round w3-red" name="delete"
+                                        value="Confirm"></input></b>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Modal-->
+            <div id="successModal" class="w3-modal" style="padding-top: 40px; display: none">
+                <div class="w3-modal-content w3-card-4 w3-animate-top">
+                    <header class="w3-container w3-green">
+                        <span onclick="document.getElementById('successModal').style.display='none'"
+                            class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
+                        <h4><?php echo $action ?> Successful</h4>
+                    </header>
+                    <div class="w3-container" style="text-align:center;">
+                        <h5>Donation list is now
+                            <?php if ($action == "Edit") { echo "updated"; } else { echo 'deleted'; }; ?>!</h5>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- End page content -->
@@ -163,11 +259,13 @@
 
         // idk how to name this XD
         function month() {
-            $( "#donation_list_table" ).load("donation_list_table.php", {type: "month"});
+            $("#donation_list_table").load("donation_list_table.php", {
+                type: "month"
+            });
         }
 
         function allData() {
-            $( "#donation_list_table" ).load("donation_list_table.php");
+            $("#donation_list_table").load("donation_list_table.php");
         }
 
 
@@ -204,12 +302,15 @@
             table = document.getElementById("myTable");
             tr = table.getElementsByTagName("tr");
             th = tr[0].getElementsByTagName("th");
-            for (i = 0; i < th.length; i++) {
+            for (i = 0; i < th.length - 2; i++) {
                 const option = document.createElement("option");
                 option.value = th[i].textContent;
                 option.innerHTML = th[i].textContent;
                 document.getElementById("sort").appendChild(option);
             }
+
+            var action = "<?php echo $action?>";
+            if (action != "") showActionModal();
         }
 
         // Clear Input
@@ -222,6 +323,40 @@
                 input.value = "";
                 filter();
             }
+        }
+
+        //delete button (need this to pass the id, cuz we not displaying id in the table right now)
+        function onDelete(id) {
+            document.getElementById("deleteDonationModal").style.display = "block";
+            $('#deleteID').val(id);
+        }
+
+        // edit button
+        function onEdit(id) {
+            document.getElementById("editDonationModal").style.display = "block";
+            $.get("fetch_donation_list.php", {
+                donationListID: id
+            }, function (data) {
+                $("[name = 'hemoglobinLevel']").val(data.hemoglobinLevel);
+                $("[name = 'bloodDonationType']").val(data.bloodDonationType);
+                $("[name = 'fluidVolume']").val(data.fluidVolume);
+                $("[name = 'donationLocation']").val(data.donationLocation);
+                $("[name = 'donorID']").val(data.donorID + " - " + data.donorName);
+                $("[name = 'donationDate']").val(data.donationDate);
+                $('#editID').val(id);
+            }, "json").fail(function () {
+                alert("error");
+            });
+        }
+
+        // Show Action Modal
+        function showActionModal() {
+            var input = document.getElementById("successModal");
+            input.style.display = "block";
+            setTimeout(() => {
+                    input.style.display = "none";
+                }, 3000) 
+            <?php $action = ""; ?>
         }
     </script>
 

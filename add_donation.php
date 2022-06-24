@@ -22,7 +22,8 @@
         $fluidvolume=$_POST['fluidvolume'];
         $plateletvolume=$_POST['plateletvolume'];
         $plasmavolume=$_POST['plasmavolume'];
-        $packedredcellvolume=$_POST['packedredcellvolume'];
+        if ($donationtype == "W")
+            $packedredcellvolume=$_POST['packedredcellvolume'];
 
         $sql="INSERT INTO donation_list(DonationListID,DonorID, DonationDate, BloodDonationType, 
         DonationLocation,HemoglobinLevel,FluidVolume) VALUES('$donationid','$donorid', '$date', '$donationtype', '$locationtype',
@@ -34,28 +35,28 @@
         {
             //Blood Bank
             case "B":
-                $sql="SELECT * FROM `blood bank` WHERE BankID ='$locationid' LIMIT 1";
+                $sql="SELECT * FROM `blood_bank` WHERE BankID ='$locationid' LIMIT 1";
                 $result=mysqli_query($conn,$sql);
                 while($row=mysqli_fetch_assoc($result))
                 {
                     $bankname=$row['BankName'];
                     $bankaddress=$row['BankAddress'];
                     $bankphone=$row['BankTelNumber'];
-                    $sql="INSERT INTO `blood bank`(DonationListID,BankID,BankName,BankAddress,BankTelNumber) 
+                    $sql="INSERT INTO `blood_bank`(DonationListID,BankID,BankName,BankAddress,BankTelNumber) 
                     VALUES('$donationid','$locationid','$bankname','$bankaddress','$bankphone')";
                     mysqli_query($conn,$sql);
                 }
                 break;
             //Local Health Centre
             case "L":
-                $sql="SELECT * FROM `local health centre` WHERE CentreID ='$locationid' LIMIT 1";
+                $sql="SELECT * FROM `local_health_centre` WHERE CentreID ='$locationid' LIMIT 1";
                 $result=mysqli_query($conn,$sql);
                 while($row=mysqli_fetch_assoc($result))
                 {
                     $centrename=$row['CentreName'];
                     $centreaddress=$row['CentreAddress'];
                     $centrephone=$row['CentreTelNumber'];
-                    $sql="INSERT INTO `local health centre`(DonationListID,CentreID,CentreName,CentreAddress,CentreTelNumber) 
+                    $sql="INSERT INTO `local_health_centre`(DonationListID,CentreID,CentreName,CentreAddress,CentreTelNumber) 
                     VALUES('$donationid','$locationid','$centrename','$centreaddress','$centrephone')";
                     mysqli_query($conn,$sql);
                 }
@@ -63,7 +64,7 @@
             
             //Mobility Programme
             case "M":
-                $sql="SELECT * FROM `mobile blood donation program` WHERE ProgramID ='$locationid' LIMIT 1";
+                $sql="SELECT * FROM `mobile_blood_donation_program` WHERE ProgramID ='$locationid' LIMIT 1";
                 $result=mysqli_query($conn,$sql);
                 while($row=mysqli_fetch_assoc($result))
                 {
@@ -71,7 +72,7 @@
                     $programaddress=$row['ProgramAddress'];
                     $programdate=$row['ProgramDate'];
                     $programtime=$row['ProgramTime'];
-                    $sql="INSERT INTO `mobile blood donation program`(DonationListID,ProgramID,ProgramName,ProgramAddress,ProgramDate,ProgramTime) 
+                    $sql="INSERT INTO `mobile_blood_donation_program`(DonationListID,ProgramID,ProgramName,ProgramAddress,ProgramDate,ProgramTime) 
                     VALUES('$donationid','$locationid','$programname','$programaddress','$programdate','$programtime')";
                     mysqli_query($conn,$sql);
                 }
@@ -82,17 +83,24 @@
         switch($donationtype)
         {
             case "A":
-                    $sql="INSERT INTO `apheresis donation`(DonationListID,PlateletVolume,PlasmaVolume) VALUE('$donationid','$plateletvolume','$plasmavolume')";
+                    $sql="INSERT INTO `aphresis_donation`(DonationListID,PlateletVolume,PlasmaVolume) VALUE('$donationid','$plateletvolume','$plasmavolume')";
                     mysqli_query($conn,$sql);
                     break;
 
             case "W":
-                    $sql="INSERT INTO `whole blood donation`(DonationListID,PackedRedCellsVolume,PlateletVolume,
+                    $sql="INSERT INTO `whole_blood_donation`(DonationListID,PackedRedCellsVolume,PlateletVolume,
                         PlasmaVolume) VALUE('$donationid','$packedredcellvolume','$plateletvolume','$plasmavolume')";
                     mysqli_query($conn,$sql);
                     break;
         }
-        
+
+        // inset data into donor, donation frequency and last donation date
+        $sql = "SELECT COUNT(*) FROM donation_list WHERE DonorID = $donorid";
+        $result = mysqli_query($conn, $sql);
+        $row = mysqli_fetch_row($result);
+        $sql = "UPDATE donor SET LastDonation = '$date', DonationFrequency = $row[0] WHERE DonorID = $donorid";
+        mysqli_query($conn, $sql);
+
     }   
     mysqli_close($conn);
 ?>

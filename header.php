@@ -62,7 +62,7 @@
         if ($blood[$i] < 3) {
             array_push($urgentNeed, $bloodType[$i]);
         }
-        echo '<div class="w3-col l1" style="margin: 0 0 20px 0">
+        echo '<div class="w3-col l2 m3 s6" style="margin: 0 0 20px 0">
                 <div class="w3-container w3-round-large w3-white w3-padding-16">
                     <div class="w3-left"><i class="material-icons w3-xxxlarge" style="color:'.$color[$i].'">bloodtype</i></div>
                     <div class="w3-right">
@@ -78,7 +78,7 @@
             <div class="w3-container w3-round-large w3-red w3-padding-16">
                 <div class="w3-left"><i class="material-icons w3-xxxlarge">warning</i></div>
                 <div class="w3-right">
-                    <h3>Urgent Needs</h3>
+                    <h3>Urgent Needs (< 3)</h3>
                 </div>
                 <div class="w3-clear"></div>
                 <h4 class="w3-row-padding">Blood Type: '; foreach ($urgentNeed as $i) { echo $i . "&ensp;"; } echo '</h4>
@@ -87,45 +87,3 @@
     echo '</div>';
 
 ?>
-<!-- <div class="w3-row-padding w3-margin-bottom">
-    <div class="w3-quarter">
-        <div class="w3-container w3-round-large w3-red w3-padding-16">
-            <div class="w3-left"><i class="fa fa-user w3-xxxlarge"></i></div>
-            <div class="w3-right">
-                <h3><?php echo $blood1 ?></h3>
-            </div>
-            <div class="w3-clear"></div>
-            <h4>A+</h4>
-        </div>
-    </div>
-    <div class="w3-quarter">
-        <div class="w3-container w3-round-large w3-blue w3-padding-16">
-            <div class="w3-left"><i class="fa fa-eye w3-xxxlarge"></i></div>
-            <div class="w3-right">
-                <h3><?php echo $blood2 ?></h3>
-            </div>
-            <div class="w3-clear"></div>
-            <h4>A-</h4>
-        </div>
-    </div>
-    <div class="w3-quarter">
-        <div class="w3-container w3-round-large w3-teal w3-padding-16">
-            <div class="w3-left"><i class="fa fa-share-alt w3-xxxlarge"></i></div>
-            <div class="w3-right">
-                <h3><?php echo $blood3 ?></h3>
-            </div>
-            <div class="w3-clear"></div>
-            <h4>B+</h4>
-        </div>
-    </div>
-    <div class="w3-quarter">
-        <div class="w3-container w3-round-large w3-orange w3-text-white w3-padding-16">
-            <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
-            <div class="w3-right">
-                <h3><?php echo $blood4 ?></h3>
-            </div>
-            <div class="w3-clear"></div>
-            <h4>B-</h4>
-        </div>
-    </div>
-</div> -->

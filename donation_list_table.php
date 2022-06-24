@@ -10,6 +10,8 @@
                 <th>Donation Date</th>
                 <th>Donor Name</th>
                 <th>Blood Type</th>
+                <th></th>
+                <th></th>
             </tr>
         ';
     
@@ -24,12 +26,12 @@
         $result = mysqli_query($conn, $sql);
         $row = mysqli_fetch_array($result);
         $date = date("Y-m", strtotime($row[4]));
-        echo "<tr style='background-color:gray; color: white'><td colspan='7'>".date_format(date_create($row[4]), "F Y")."</td></tr>";
+        echo "<tr style='background-color:gray; color: white'><td colspan='9'>".date_format(date_create($row[4]), "F Y")."</td></tr>";
 
         while ($row) {
            if(date("Y-m", strtotime($row[4])) != $date){
                 $date = date("Y-m", strtotime($row[4]));
-                echo "<tr style='background-color:gray; color:white'><td colspan='7'>".date_format(date_create($row[4]), "F Y")."</td></tr>";
+                echo "<tr style='background-color:gray; color:white'><td colspan='9'>".date_format(date_create($row[4]), "F Y")."</td></tr>";
             }
                 $row[2] = ($row[2] == "W") ? "Whole" : "Apheresis";
                 echo "<tr>";
@@ -40,6 +42,8 @@
                 echo "<td>$row[4]</td>";
                 echo "<td>$row[5]</td>";
                 echo "<td>$row[6]</td>";
+                echo "<td><button onclick=onEdit($row[0]) class=\"w3-btn w3-round w3-teal\">Edit</button></td>";
+                echo "<td><button onclick=onDelete($row[0]) class=\"w3-btn w3-round w3-teal\">Delete</button></td>";
                 echo "</tr>";
 
                 $row = mysqli_fetch_array($result);
@@ -62,6 +66,8 @@
             echo "<td>$row[4]</td>";
             echo "<td>$row[5]</td>";
             echo "<td>$row[6]</td>";
+            echo "<td><button onclick=onEdit($row[0]) class=\"w3-btn w3-round w3-teal\">Edit</button></td>";
+            echo "<td><button onclick=onDelete($row[0]) class=\"w3-btn w3-round w3-teal\">Delete</button></td>";
             echo "</tr>";
         }
     }

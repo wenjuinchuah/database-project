@@ -23,4 +23,5 @@
     echo json_encode( array( "fname"=>$fname, "lname"=>$lname, "ic"=>$ic, "weight"=>$weight, "age"=>$age, "sex"=>$sex,
     "bloodtype"=> $bloodtype, "phone"=>$phone, "address"=>$address, "email"=>$email, "nationality"=>$nationality ));
 
+    mysqli_close($conn);
 ?>

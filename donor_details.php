@@ -1,5 +1,7 @@
 <?php
     include 'connect.php';
+    // For the use of Success Modal
+    $action = "";
 
     $empID = $_GET['empID'];
     if (!isset($empID)) {
@@ -21,14 +23,6 @@
     }
 
     include 'delete_donor.php';
-
-    // Get Donor Sum
-    $donorSum = 0;
-    $sql = "SELECT * FROM donor";
-
-    if ($result = mysqli_query($conn,$sql))
-        $donorSum = mysqli_num_rows($result);
-
     include 'edit_donor.php';
 
     mysqli_close($conn);
@@ -42,10 +36,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <!-- <link rel="stylesheet" href="src/style.css"> -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.5.1/css/flag-icons.min.css"
+        integrity="sha512-uvXdJud8WaOlQFjlz9B15Yy2Au/bMAvz79F7Xa6OakCl2jvQPdHD0hb3dEqZRdSwG4/sknePXlE7GiarwA/9Wg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         html,
         body,
@@ -65,7 +61,7 @@
 </head>
 
 <body class="w3-light-grey">
-    
+
     <!-- Top container -->
     <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
         <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey"
@@ -97,7 +93,9 @@
                     class="fa fa-eye fa-fw"></i>  Donor Details</a>
             <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i
                     class="fa fa-users fa-fw"></i>  Donation
-                List</a><br><br>
+                    List</a>
+            <a href="./report.php" target="_blank" class="w3-bar-item w3-button w3-padding"><i
+                    class="	fa fa-archive fa-fw"></i>  Generate Report</a><br><br>
         </div>
     </nav>
 
@@ -119,8 +117,7 @@
                     <option value="" disabled selected>Sort by</option>
                 </select>
                 <div class="w3-rest">
-                    <input class="w3-input w3-border" type="text" placeholder="Search" id="myInput"
-                        onkeyup="filter()">
+                    <input class="w3-input w3-border" type="text" placeholder="Search" id="myInput" onkeyup="filter()">
                 </div>
             </div>
 
@@ -174,8 +171,79 @@
                                 class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
                             <h2>Edit Donor Details</h2>
                         </header>
-                        <div class="w3-container" id="editform" >
-                            <?php include 'edit_form.php'?> <!-- this one no need deliberately put it in php also can one, i just trying something that time-->
+                        <div class="w3-container" id="editform">
+                            <form class='w3-row-padding' action="" method='POST'>
+                                <input type="hidden" id="editID" name="editID">
+                                <div class='w3-half w3-padding-16'>
+                                    <label>First Name</label>
+                                    <input class='w3-input' name='donorFN' type='text' required>
+                                </div>
+                                <div class='w3-half w3-padding-16'>
+                                    <label>Last Name</label>
+                                    <input class='w3-input' name='donorLN' type='text' required>
+                                </div>
+                                <div class='w3-quarter w3-padding-16'>
+                                    <label>Weight</label>
+                                    <input class='w3-input' name='donorWeight' type='text' required>
+                                </div>
+                                <div class='w3-quarter w3-padding-16'>
+                                    <label>Age</label>
+                                    <input class='w3-input' name='donorAge' type='text' required>
+                                </div>
+                                <div class='w3-quarter w3-padding-16'>
+                                    <label>Sex</label>
+                                    <select class='w3-select' name='donorSex' required>
+                                        <option value='M' selected>Male</option>
+                                        <option value='F'>Female</option>
+                                    </select>
+                                </div>
+                                <div class='w3-quarter w3-padding-16'>
+                                    <label>Blood Type</label>
+                                    <select class='w3-select' name='donorbloodtype' required>
+                                        <option value='A+' selected>A+</option>
+                                        <option value='A-'>A-</option>
+                                        <option value='B+'>B+</option>
+                                        <option value='B-'>B-</option>
+                                        <option value='AB+'>AB+</option>
+                                        <option value='AB-'>AB-</option>
+                                        <option value='O+'>O+</option>
+                                        <option value='O-'>O-</option>
+                                    </select>
+                                </div>
+                                <div class='w3-row-padding w3-padding-16'>
+                                    <label>Home Address</label>
+                                    <input class='w3-input' name='donorAddress' type='text' required>
+                                </div>
+                                <div class='w3-twothird w3-padding-16'>
+                                    <label>Identity Card No / Passport No</label>
+                                    <input class='w3-input' name='donorIC' type='text' required>
+                                </div>
+                                <div class='w3-third w3-padding-16'>
+                                    <div><label>Phone No</label></div>
+                                    <div class='w3-cell w3-quarter w3-input'>
+                                        <span class="fi fi-my"></span> +60
+                                    </div>
+                                    <div class='w3-cell w3-threequarter'>
+                                        <input class='w3-input' name='donorPhone' type='text' required>
+                                    </div>
+                                </div>
+                                <div class='w3-half w3-padding-16'>
+                                    <label>Email</label>
+                                    <input class='w3-input' name='donorEmail' type='text' required>
+                                </div>
+                                <div class='w3-half w3-padding-16'>
+                                    <label>Nationality</label>
+                                    <select class='w3-select' name='nationality' required>
+                                        <option value='Malaysian' selected>Malaysian</option>
+                                        <option value='Others'>Others</option>
+                                    </select>
+                                </div>
+                                <div class='w3-row-padding'>
+                                    <b><input type='submit' class='w3-btn w3-block w3-round w3-green' id="editDonor" name='editDonor'
+                                            value='Edit Donor'></input></b>
+                                </div>
+                                <br>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -201,6 +269,20 @@
                                             value="Confirm"></input></b>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Modal-->
+                <div id="successModal" class="w3-modal" style="padding-top: 40px; display: none">
+                    <div class="w3-modal-content w3-card-4 w3-animate-top">
+                        <header class="w3-container w3-green">
+                            <span onclick="document.getElementById('successModal').style.display='none'"
+                                class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
+                            <h4><?php echo $action ?> Successful</h4>
+                        </header>
+                        <div class="w3-container" style="text-align:center;">
+                            <h5><?php if ($action == "Edit") { echo "Donor details is updated"; } else { echo 'This donor is deleted'; }; ?>!</h5>
                         </div>
                     </div>
                 </div>
@@ -245,12 +327,11 @@
             table = document.getElementById("myTable");
             tr = table.getElementsByTagName("tr");
             sort = document.getElementById("sort");
-            // console.log(sort.selectedIndex);
 
             for (i = 0; i < tr.length; i++) {
                 // To filter different category ("td")[change me]
                 td = tr[i].getElementsByTagName("td")[sort.selectedIndex - 1];
-
+                console.log(td);
                 if (td) {
                     txtValue = td.textContent || td.innerText;
 
@@ -264,15 +345,17 @@
         }
 
         //delete button (need this to pass the id, cuz we not displaying id in the table right now)
-        function onDelete(id){
-            document.getElementById("deleteDonorModal").style.display="block";
+        function onDelete(id) {
+            document.getElementById("deleteDonorModal").style.display = "block";
             $('#deleteID').val(id);
         }
 
         // edit button
-        function onEdit(id){
-            document.getElementById("editDonorModal").style.display="block";
-            $.get( "fetch_donor.php", {donorID: id}, function( data ) {
+        function onEdit(id) {
+            document.getElementById("editDonorModal").style.display = "block";
+            $.get("fetch_donor.php", {
+                donorID: id
+            }, function (data) {
                 $("[name = 'donorFN']").val(data.fname);
                 $("[name = 'donorLN']").val(data.lname);
                 $("[name = 'donorWeight']").val(data.weight);
@@ -285,24 +368,27 @@
                 $("[name = 'donorEmail']").val(data.email);
                 $("[name = 'nationality']").val(data.nationality);
                 $('#editID').val(id);
-            }, "json").fail(function() {
-                alert( "error" );
+            }, "json").fail(function () {
+                alert("error");
             });
         }
 
         // Sort by
-        window.onload = function sortBy() {
+        window.onload = function () {
             var input, table, tr, th, i;
             input = document.getElementById("sort");
             table = document.getElementById("myTable");
             tr = table.getElementsByTagName("tr");
-            th = tr[0].getElementsByTagName("th"); 
-            for (i = 0; i < th.length - 1; i++) {
+            th = tr[0].getElementsByTagName("th");
+            for (i = 0; i < th.length - 2; i++) {
                 const option = document.createElement("option");
                 option.value = th[i].textContent;
                 option.innerHTML = th[i].textContent;
                 document.getElementById("sort").appendChild(option);
             }
+
+            var action = "<?php echo $action?>";
+            if (action != "") showActionModal();
         }
 
         // Clear Input
@@ -315,6 +401,16 @@
                 input.value = "";
                 filter();
             }
+        }
+
+        // Show Action Modal
+        function showActionModal() {
+            var input = document.getElementById("successModal");
+            input.style.display = "block";
+            setTimeout(() => {
+                input.style.display = "none";
+            }, 3000)
+            <?php $action = ""; ?>
         }
     </script>
 

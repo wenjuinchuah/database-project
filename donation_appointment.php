@@ -82,7 +82,8 @@
         <div class="w3-bar-block">
             <a href="./dashboard.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i class="fa fa-file-text-o fa-fw"></i>  Donor Registration</a>
             <a href="./donor_details.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i class="fa fa-eye fa-fw"></i>  Donor Details</a>
-            <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i class="fa fa-users fa-fw"></i>  Donation List</a><br><br>
+            <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i class="fa fa-users fa-fw"></i>  Donation List</a>
+            <a href="./report.php" target="_blank" class="w3-bar-item w3-button w3-padding"><i class="	fa fa-archive fa-fw"></i>  Generate Report</a><br><br>
         </div>
     </nav>
 
@@ -126,7 +127,7 @@
                     </div>
                     <div class="w3-third w3-padding-16">
                         <label>Donation Type</label>
-                        <select class="w3-select" name="donationtype" required>
+                        <select class="w3-select" name="donationtype" id="donationType" onchange="updateDonationType()" required>
                             <option value="W" selected>Whole Blood</option>
                             <option value="A">Aphresis</option>
                         </select>
@@ -163,7 +164,7 @@
                     </div>  
                     <div class="w3-row-padding w3-padding-16">
                         <label>Packed Red Cell Volume (ml)</label>
-                        <input class="w3-input" type="text" name="packedredcellvolume" placeholder="For Whole Blood Donation only">
+                        <input class="w3-input" type="text" name="packedredcellvolume" id="packedRedCell" placeholder="For Whole Blood Donation only">
                     </div>
                     <div class="w3-row-padding">
                         <b><button type="submit" class="w3-btn w3-block w3-round w3-green" name="addDonation">Add Donation</button></b
@@ -180,19 +181,36 @@
     <?php
         include 'connect.php';
         $counter = 0;
+        $list = array();
         $tableList = ['B', 'L', 'M'];
 
         foreach ($tableList as $i) {
-            echo '<table class="w3-table-all" id="'.$i.'" style="display: none">';    
-            $i = ($i == 'B') ? 'blood_bank' : (($i == 'L') ? 'local_health_centre' : 'mobile_blood_donation_program');
-            $sql = "SELECT * FROM $i";
+            $isFound = false;
+            echo '<table class="w3-table-all" id="'.$i.'" style="display: none">';
+            switch ($i) {
+                case 'B':
+                    $sql = "SELECT * FROM blood_bank";
+                    break;
+                case 'L':
+                    $sql = "SELECT * FROM local_health_centre";
+                    break;
+                case 'M':
+                    $sql = "SELECT * FROM mobile_blood_donation_program";
+                    break;
+            }
             $result = mysqli_query($conn, $sql);
 
             while ($row = mysqli_fetch_array($result)) {
-                echo "<tr>";
-                echo "<td>$row[1]</td>";
-                echo "<td>$row[2]</td>";
-                echo "</tr>";
+                foreach ($list as $j) {
+                    ($j == $row[1]) ? $isFound = true : "";
+                }
+                array_push($list, $row[1]);
+                if ($isFound == false) {
+                    echo "<tr>";
+                    echo "<td>$row[1]</td>";
+                    echo "<td>$row[2]</td>";
+                    echo "</tr>";
+                }
             }
             echo '</table>';
         }
@@ -224,9 +242,10 @@
             overlayBg.style.display = "none";
         }
 
-        // Check LocationType
+        // Check LocationType and DonationType
         window.onload = function () {
             updateLocation();
+            updateDonationType();
         }
 
         // Update Location
@@ -254,6 +273,18 @@
                 input.remove(i);
             }
             updateLocation();
+        }
+
+        function updateDonationType() {
+            var input, output;
+            input = document.getElementById("donationType");
+            output = document.getElementById("packedRedCell");
+            // index = 0 means Whole Blood Donation
+            if (input.selectedIndex == 0) {
+                output.disabled = false;
+            } else {
+                output.disabled = true;
+            }
         }
     </script>
 

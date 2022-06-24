@@ -1,6 +1,8 @@
 <?php
     include 'connect.php';
 
+    $action = "";
+
     $empID = $_GET['empID'];
     if (!isset($empID)) {
         echo 'ERROR';
@@ -20,13 +22,6 @@
         }
     }
 
-    // Get Donor Sum
-    $donorSum = 0;
-    $sql = "SELECT * FROM donor";
-
-    if ($result = mysqli_query($conn,$sql))
-        $donorSum = mysqli_num_rows($result);
-
     include 'add_donor.php';
 
     mysqli_close($conn);
@@ -43,6 +38,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.5.1/css/flag-icons.min.css"
+        integrity="sha512-uvXdJud8WaOlQFjlz9B15Yy2Au/bMAvz79F7Xa6OakCl2jvQPdHD0hb3dEqZRdSwG4/sknePXlE7GiarwA/9Wg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         html,
         body,
@@ -62,8 +60,8 @@
     <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
         <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey"
             onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
-        <button class="w3-bar-item w3-right w3-button"
-            onclick="window.location.href='./index.php';"><i class="fa fa-sign-out"></i></button>
+        <button class="w3-bar-item w3-right w3-button" onclick="window.location.href='./index.php';"><i
+                class="fa fa-sign-out"></i></button>
         <span class="w3-bar-item w3-hide-small">Blood Donation Management System</span>
     </div>
 
@@ -74,7 +72,8 @@
                 <img src="./src/avatar2.png" class="w3-circle w3-margin-right" style="width:60px">
             </div>
             <div class="w3-col s8 w3-bar w3-padding-16">
-                <span style="font-size: 16px">Welcome, <strong><?php echo strstr($empName, ' ', true) ?></strong></span><br>
+                <span style="font-size: 16px">Welcome,
+                    <strong><?php echo strstr($empName, ' ', true) ?></strong></span><br>
             </div>
         </div>
         <hr>
@@ -82,9 +81,14 @@
             <h5>Dashboard</h5>
         </div>
         <div class="w3-bar-block">
-            <a href="./dashboard.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding w3-teal"><i class="fa fa-file-text-o fa-fw"></i>  Donor Registration</a>
-            <a href="./donor_details.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i class="fa fa-eye fa-fw"></i>  Donor Details</a>
-            <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i class="fa fa-users fa-fw"></i>  Donation List</a><br><br>
+            <a href="./dashboard.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding w3-teal"><i
+                    class="fa fa-file-text-o fa-fw"></i>  Donor Registration</a>
+            <a href="./donor_details.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i
+                    class="fa fa-eye fa-fw"></i>  Donor Details</a>
+            <a href="./donation_list.php?empID=<?php echo $empID ?>" class="w3-bar-item w3-button w3-padding"><i
+                    class="fa fa-users fa-fw"></i>  Donation List</a>
+            <a href="./report.php" target="_blank" class="w3-bar-item w3-button w3-padding"><i
+                    class="	fa fa-archive fa-fw"></i>  Generate Report</a><br><br>
         </div>
     </nav>
 
@@ -148,9 +152,14 @@
                         <label>Identity Card No / Passport No</label>
                         <input class='w3-input' name='donorIC' type='text' required>
                     </div>
-                    <div class='w3-third w3-padding-16'>
-                        <label>Phone No</label>
-                        <input class='w3-input' name='donorPhone' type='text' required>
+                    <div class='w3-third w3-padding-16 w3-row'>
+                        <div><label>Phone No</label></div>
+                        <div class='w3-col w3-input' style="width: 70px">
+                            <span class="fi fi-my"></span>&ensp;+60
+                        </div>
+                        <div class='w3-rest'>
+                            <input class='w3-input' name='donorPhone' type='text' required>
+                        </div>
                     </div>
                     <div class='w3-half w3-padding-16'>
                         <label>Email</label>
@@ -164,13 +173,26 @@
                         </select>
                     </div>
                     <div class='w3-row-padding'>
-                        <b><input type='submit' class='w3-btn w3-block w3-round w3-green'
-                                name='addDonor' value='Add Donor'></input></b>
+                        <b><input type='submit' class='w3-btn w3-block w3-round w3-green' name='addDonor'
+                                value='Add Donor'></input></b>
                     </div>
                     <br>
                 </form>
             </div>
             <br>
+            <!-- Success Modal-->
+            <div id="successModal" class="w3-modal" style="padding-top: 40px; display: none">
+                <div class="w3-modal-content w3-card-4 w3-animate-top">
+                    <header class="w3-container w3-green">
+                        <span onclick="document.getElementById('successModal').style.display='none'"
+                            class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
+                        <h4><?php echo $action ?> Successful</h4>
+                    </header>
+                    <div class="w3-container" style="text-align:center;">
+                        <h5>New donor is added to the database!</h5>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- End page content -->
     </div>
@@ -197,6 +219,21 @@
         function w3_close() {
             mySidebar.style.display = "none";
             overlayBg.style.display = "none";
+        }
+
+        window.onload = function () {
+            var action = "<?php echo $action?>";
+            if (action != "") showActionModal();
+        }
+
+        // Show Action Modal
+        function showActionModal() {
+            var input = document.getElementById("successModal");
+            input.style.display = "block";
+            setTimeout(() => {
+                input.style.display = "none";
+            }, 3000)
+            <?php $action = ""; ?>
         }
     </script>
 

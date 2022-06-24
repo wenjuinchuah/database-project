@@ -25,6 +25,8 @@
             if(!mysqli_query($conn, $sql)){
                 echo "Error: " . $sql . "<br>" . $conn->error;
             }
+
+            $action = "Add";
         }else{
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
