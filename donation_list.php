@@ -5,6 +5,9 @@
     $action = "";
 
     $empID = $_GET['empID'];
+    if (isset($_GET['action'])) {
+        $action = $_GET['action'];
+    }
     if (!isset($empID)) {
         echo 'ERROR';
     } else {
@@ -141,32 +144,37 @@
                         <span onclick="document.getElementById('editDonationModal').style.display='none'"
                             class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
                         <!-- !TODO -->
-                        <h2>Edit DonationList (WIP)</h2>
+                        <h2>Edit DonationList</h2>
                     </header>
                     <div class="w3-container" id="editform">
                         <form class='w3-row-padding' action="" method='POST'>
                             <input type="hidden" id="editID" name="editID">
-                            <div class='w3-half w3-padding-16'>
+                            <div class='w3-twothird w3-padding-16'>
                                 <label>Donor Name</label>
                                 <input class='w3-input' name='donorID' type='text' disabled>
                             </div>
-                            <div class='w3-quarter w3-padding-16'>
-                                <label>Donation Type</label>
-                                <select class='w3-select' name='bloodDonationType' required>
-                                    <option value='W'>Whole</option>
-                                    <option value='A'>Aphresis</option>
-                                </select>
-                            </div>
-                            <div class='w3-quarter w3-padding-16'>
+                            <div class='w3-third w3-padding-16'>
                                 <label>Date</label>
                                 <input class="w3-input" type="date" name="donationDate" required>
                             </div>
                             <div class='w3-third w3-padding-16'>
                                 <label>Donation Location</label>
-                                <select class='w3-select' name='donationLocation' required>
-                                    <option value="B" selected>Blood Bank</option>
+                                <select class='w3-select' name='donationLocation' id="locationType" onchange="showLocation(document.getElementById('locationType').value)" required>
+                                    <option value="B">Blood Bank</option>
                                     <option value="L">Local Health Centre</option>
                                     <option value="M">Mobility Programme</option>
+                                </select>
+                            </div>
+                            <div class="w3-twothird w3-padding-16">
+                                <label>Location ID</label>
+                                <select class="w3-select" type="text" name="locationid" id="location" required>
+                                </select>
+                            </div> 
+                            <div class='w3-third w3-padding-16'>
+                                <label>Donation Type</label>
+                                <select class='w3-select' name='bloodDonationType' id="bloodDonationType" onchange="updateDonationType()"required>
+                                    <option value='W'>Whole</option>
+                                    <option value='A'>Aphresis</option>
                                 </select>
                             </div>
                             <div class='w3-third w3-padding-16'>
@@ -175,7 +183,20 @@
                             </div>
                             <div class='w3-third w3-padding-16'>
                                 <label>Fluid Volume</label>
-                                <input class='w3-input' name='fluidVolume' type='text' required>
+                                <input class='w3-input' name='fluidVolume' type='text' value="0" required readonly>
+                            </div>
+                            <div class='w3-half w3-padding-16'>
+                                <label>Platelet Volume Level</label>
+                                <input class='w3-input' name='plateletVolume' oninput='calculateVolume()' value="0" type='number' required>
+                            </div>
+                            <div class='w3-half w3-padding-16'>
+                                <label>Plasma Volume</label>
+                                <input class='w3-input' name='plasmaVolume' oninput='calculateVolume()' value="0" type='number' required>
+                            </div>
+                            <!--show packed red cell if selected whole blood-->
+                            <div class="w3-row-padding w3-padding-16">
+                                <label>Packed Red Cell Volume (ml)</label>
+                                <input class="w3-input" type="number" oninput='calculateVolume()' name="packedredcellvolume" id="packedRedCell" placeholder="For Whole Blood Donation only" required>
                             </div>
                             <div class='w3-row-padding'>
                                 <b><input type='submit' class='w3-btn w3-block w3-round w3-green' id="editDonationList"
@@ -221,8 +242,8 @@
                         <h4><?php echo $action ?> Successful</h4>
                     </header>
                     <div class="w3-container" style="text-align:center;">
-                        <h5>Donation list is now
-                            <?php if ($action == "Edit") { echo "updated"; } else { echo 'deleted'; }; ?>!</h5>
+                        <h5>Donation list is
+                            <?php if ($action == "Edit") { echo "updated"; } else if ($action == "Add") { echo "added"; } else { echo 'deleted'; }; ?>!</h5>
                     </div>
                 </div>
             </div>
@@ -230,6 +251,52 @@
 
         <!-- End page content -->
     </div>
+
+    <!-- Table for each location -->
+    <?php
+        include 'connect.php';
+        $counter = 0;
+        $list = array();
+        $tableList = ['B', 'L', 'M'];
+
+        foreach ($tableList as $i) {
+            $isFound = false;
+            echo '<table class="w3-table-all" id="'.$i.'" style="display: none">';
+            switch ($i) {
+                case 'B':
+                    $sql = "SELECT * FROM blood_bank";
+                    break;
+                case 'L':
+                    $sql = "SELECT * FROM local_health_centre";
+                    break;
+                case 'M':
+                    $sql = "SELECT * FROM mobile_blood_donation_program";
+                    break;
+            }
+            $result = mysqli_query($conn, $sql);
+
+            while ($row = mysqli_fetch_array($result)) {
+                foreach ($list as $j) {
+                    if ($j == $row[1]) {
+                        $isFound = true;
+                        break;
+                    }
+                    else
+                        $isFound = false;
+                }
+                if ($isFound == false) {
+                    array_push($list, $row[1]);
+                    echo "<tr>";
+                    echo "<td>$row[1]</td>";
+                    echo "<td>$row[2]</td>";
+                    echo "</tr>";
+                }
+            }
+
+            echo '</table>';
+        }
+        mysqli_close($conn);
+    ?>
 
     <!-- import jquery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -257,15 +324,17 @@
             overlayBg.style.display = "none";
         }
 
-        // idk how to name this XD
+        // Table filter by month
         function month() {
             $("#donation_list_table").load("donation_list_table.php", {
                 type: "month"
             });
+            clearInput();
         }
 
         function allData() {
             $("#donation_list_table").load("donation_list_table.php");
+            clearInput();
         }
 
 
@@ -295,8 +364,14 @@
             }
         }
 
-        // Sort by
-        window.onload = function sortBy() {
+        // Check DonationType and Sort
+        window.onload = function () {
+            sorting();
+            updateDonationType();
+        }
+
+        // Sorting
+        function sorting() {
             var input, table, tr, th, i;
             input = document.getElementById("sort");
             table = document.getElementById("myTable");
@@ -325,28 +400,38 @@
             }
         }
 
-        //delete button (need this to pass the id, cuz we not displaying id in the table right now)
+        // Delete Button
         function onDelete(id) {
             document.getElementById("deleteDonationModal").style.display = "block";
             $('#deleteID').val(id);
         }
 
-        // edit button
+        // Edit button
         function onEdit(id) {
             document.getElementById("editDonationModal").style.display = "block";
-            $.get("fetch_donation_list.php", {
-                donationListID: id
-            }, function (data) {
+            $.get("fetch_donation_list.php", { donationListID: id }, function (data) {
+                console.log(data);
+                $('#editID').val(id);
+                $("[name = 'donorID']").val(data.donorID + " - " + data.donorName);
+                $("[name = 'donationDate']").val(data.donationDate);
                 $("[name = 'hemoglobinLevel']").val(data.hemoglobinLevel);
                 $("[name = 'bloodDonationType']").val(data.bloodDonationType);
                 $("[name = 'fluidVolume']").val(data.fluidVolume);
+                $("[name = 'plateletVolume']").val(data.plateletVolume);
+                $("[name = 'plasmaVolume']").val(data.plasmaVolume);
                 $("[name = 'donationLocation']").val(data.donationLocation);
-                $("[name = 'donorID']").val(data.donorID + " - " + data.donorName);
-                $("[name = 'donationDate']").val(data.donationDate);
-                $('#editID').val(id);
-            }, "json").fail(function () {
-                alert("error");
-            });
+                // $("[name = 'locationid']").val(data.location + " - " + data.locationName);         //---    
+                                                                                                      //  |
+                // Perform remove current location option list, and update new location option list   //  |
+                showLocation(data.donationLocation);                                                  //  |
+                document.getElementById("location").value = data.location; 
+
+                if (data.packedredcell != 0) {
+                    $("[name = 'packedredcellvolume']").val(data.packedredcell); // fixed aphresis's problem
+                }
+                updateDonationType();
+
+            }, "json").fail(() => alert("error"));
         }
 
         // Show Action Modal
@@ -355,8 +440,69 @@
             input.style.display = "block";
             setTimeout(() => {
                     input.style.display = "none";
-                }, 3000) 
+                }, 3000)
             <?php $action = ""; ?>
+        }
+
+        // Auto calculate fluid volume
+        function calculateVolume() {
+            var volume = document.getElementsByName("fluidVolume")[0];
+            var type = document.getElementById("bloodDonationType").value;
+            var plasma = document.getElementsByName("plasmaVolume")[0].value;
+            var platelet = document.getElementsByName("plateletVolume")[0].value;
+
+            if(type === "W") { // if whole blood
+                var redblood = document.getElementById("packedRedCell").value;
+                volume.value = parseFloat(plasma) + parseFloat(platelet) + parseFloat(redblood);
+            }else{ // else
+                volume.value = parseFloat(plasma) + parseFloat(platelet);
+            }  
+        }
+
+        // Update Location
+        function updateLocation(donationLocation) {
+            var input, location, table, tr, td, i;
+            input = document.getElementById("locationType");
+            location = document.getElementById("location");
+            table = document.getElementById(donationLocation);
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td");
+                const option = document.createElement("option");
+                option.value = td[0].textContent;
+                option.innerHTML = td[0].textContent + " - " + td[1].textContent;
+                document.getElementById("location").appendChild(option);
+            }
+        }
+
+        // Show Location
+        function showLocation(donationLocation) {
+            var i, input;
+            input = document.getElementById("location");
+            for(i = input.options.length; i >= 0; i--) {
+                input.remove(i);
+            }
+            updateLocation(donationLocation);
+        }
+
+        // Update Donation Type
+        function updateDonationType() {
+            var input, output;
+            input = document.getElementById("bloodDonationType");
+            output = document.getElementById("packedRedCell");
+            // set default
+            output.disabled = false;
+            // index = 0 means Whole Blood Donation
+            if (input.selectedIndex == 0) {
+                output.disabled = false;
+                // output.value = 0;
+            } else {
+                output.value = "";
+                output.disabled = true;
+                output.value = NaN;
+            }
+            calculateVolume();
         }
     </script>
 

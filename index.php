@@ -1,7 +1,6 @@
 <!-- Can login using any Employee ID (No password validation) -->
 <!-- phpmyadmin username: root -->
 <!-- phpmyadmin password: Root@123 -->
-<!-- SET GLOBAL FOREIGN_KEY_CHECKS=0 -->
 
 <?php
     include 'connect.php';

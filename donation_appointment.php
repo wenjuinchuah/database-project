@@ -152,19 +152,19 @@
                     </div>
                     <div class="w3-half w3-padding-16">
                         <label>Fluid Volume (ml)</label>
-                        <input class="w3-input" type="text" name="fluidvolume" required>
+                        <input class="w3-input" type="text" name="fluidvolume" value="0" required readonly>
                     </div>  
                     <div class="w3-half w3-padding-16">
                         <label>Platelet Volume (ml)</label>
-                        <input class="w3-input" type="text" name="plateletvolume" required>
+                        <input class="w3-input" oninput='calculateVolume()' type="number" name="plateletvolume" value="0" required>
                     </div> 
                     <div class="w3-half w3-padding-16">
                         <label>Plasma Volume (ml)</label>
-                        <input class="w3-input" type="text" name="plasmavolume" required>
+                        <input class="w3-input" oninput='calculateVolume()' type="number" name="plasmavolume" value="0" required>
                     </div>  
                     <div class="w3-row-padding w3-padding-16">
                         <label>Packed Red Cell Volume (ml)</label>
-                        <input class="w3-input" type="text" name="packedredcellvolume" id="packedRedCell" placeholder="For Whole Blood Donation only">
+                        <input class="w3-input" oninput='calculateVolume()' type="number" name="packedredcellvolume" id="packedRedCell" placeholder="For Whole Blood Donation only">
                     </div>
                     <div class="w3-row-padding">
                         <b><button type="submit" class="w3-btn w3-block w3-round w3-green" name="addDonation">Add Donation</button></b
@@ -178,6 +178,7 @@
         <!-- End page content -->
     </div>
 
+    <!-- Table for each location -->
     <?php
         include 'connect.php';
         $counter = 0;
@@ -202,10 +203,15 @@
 
             while ($row = mysqli_fetch_array($result)) {
                 foreach ($list as $j) {
-                    ($j == $row[1]) ? $isFound = true : "";
+                    if ($j == $row[1]) {
+                        $isFound = true;
+                        break;
+                    }
+                    else
+                        $isFound = false;
                 }
-                array_push($list, $row[1]);
                 if ($isFound == false) {
+                    array_push($list, $row[1]);
                     echo "<tr>";
                     echo "<td>$row[1]</td>";
                     echo "<td>$row[2]</td>";
@@ -242,6 +248,21 @@
             overlayBg.style.display = "none";
         }
 
+        // Auto calculate fluid volume
+        function calculateVolume() {
+            var volume = document.getElementsByName("fluidvolume")[0];
+            var type = document.getElementById("donationType").value;
+            var plasma = document.getElementsByName("plasmavolume")[0].value;
+            var platelet = document.getElementsByName("plateletvolume")[0].value;
+
+            if(type === "W") { // if whole blood
+                var redblood = document.getElementById("packedRedCell").value;
+                volume.value = parseFloat(plasma) + parseFloat(platelet) + parseFloat(redblood);
+            }else{ // else
+                volume.value = parseFloat(plasma) + parseFloat(platelet);
+            }  
+        }
+
         // Check LocationType and DonationType
         window.onload = function () {
             updateLocation();
@@ -275,6 +296,7 @@
             updateLocation();
         }
 
+        // Update Donation Typec & Auto calculate fluid volume
         function updateDonationType() {
             var input, output;
             input = document.getElementById("donationType");
@@ -282,9 +304,12 @@
             // index = 0 means Whole Blood Donation
             if (input.selectedIndex == 0) {
                 output.disabled = false;
+                output.value = 0;
             } else {
                 output.disabled = true;
+                output.value = NaN;
             }
+            calculateVolume();
         }
     </script>
 

@@ -4,12 +4,16 @@
 
     if(isset($_POST['delete'])) {
         $id = $_POST['deleteID'];
+        $isDonor = false;
+        $donorDetails = "";
 
         // Before delete a donor, need to delete all its donation list and relevant connected tables
         if (strlen(strval($id)) == 4) {
             $sql = "SELECT * FROM donation_list WHERE DonationListID = $id";
+            $isDonor = false;
         } else {
             $sql = "SELECT * FROM donation_list WHERE DonorID = $id";
+            $isDonor = true;
         }
         $result = mysqli_query($conn, $sql);
 
@@ -42,10 +46,39 @@
                 if (!mysqli_query($conn, $sql))
                     echo "Error: " . $sql . "<br>" . $conn->error;
                 
-                // delete donationList
+                // Minus donation frequency
+                if (!$isDonor) {
+                    $sql = "SELECT * FROM donor WHERE DonorID = $row[5]";
+                    $reuslt1 = mysqli_query($conn, $sql);
+                    if (!$reuslt1)
+                        echo "Error: " . $sql . "<br>" . $conn->error;
+                    else
+                        $donorDetails = mysqli_fetch_array($reuslt1);
+                }
+                $sql = "UPDATE donor SET DonationFrequency = $donorDetails[11]-1 WHERE DonorID = $donorDetails[0]";
+                if (!mysqli_query($conn, $sql))
+                    echo "Error: " . $sql . "<br>" . $conn->error;
+
+                // Delete donationList
                 $sql = "DELETE FROM donation_list WHERE DonationListID = $row[0]";
                 if (!mysqli_query($conn, $sql)) {
                     echo "Error: " . $sql . "<br>" . $conn->error;
+                }
+
+                // Update donor latest donation date 
+                $sql = "SELECT * FROM donation_list WHERE DonorID = $donorDetails[0] ORDER BY DonationDate DESC";
+                $result2 = mysqli_query($conn, $sql);
+                if (!$result2)
+                    echo "Error: " . $sql . "<br>" . $conn->error;
+                else {
+                    if ($donationList = mysqli_fetch_array($result2))
+                        $row[10] = $donationList[6];
+                    else 
+                        $row[10] = "0000-00-00";
+
+                    $sql = "UPDATE donor SET LastDonation = '$row[10]' WHERE DonorID = '$donorDetails[0]'";
+                    if (!mysqli_query($conn, $sql))
+                        echo "Error: " . $sql . "<br>" . $conn->error;
                 }
             }
         }

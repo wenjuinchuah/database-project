@@ -22,12 +22,13 @@
         $fluidvolume=$_POST['fluidvolume'];
         $plateletvolume=$_POST['plateletvolume'];
         $plasmavolume=$_POST['plasmavolume'];
+        $empID = $_GET['empID'];
         if ($donationtype == "W")
             $packedredcellvolume=$_POST['packedredcellvolume'];
 
         $sql="INSERT INTO donation_list(DonationListID,DonorID, DonationDate, BloodDonationType, 
-        DonationLocation,HemoglobinLevel,FluidVolume) VALUES('$donationid','$donorid', '$date', '$donationtype', '$locationtype',
-        '$hemoglobinlevel','$fluidvolume') ";
+        DonationLocation,HemoglobinLevel,FluidVolume,EmpID) VALUES('$donationid','$donorid', '$date', '$donationtype', '$locationtype',
+        '$hemoglobinlevel','$fluidvolume', '$empID') ";
         mysqli_query($conn,$sql);
 
         //Insert data to donation location
@@ -106,5 +107,5 @@
 ?>
 
 <script>
-    window.location.href="./donation_list.php?empID=<?php echo $empID?>";
+    window.location.href="./donation_list.php?empID=<?php echo $empID?>&action=Add";
 </script>

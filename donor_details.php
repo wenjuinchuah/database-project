@@ -144,6 +144,23 @@
                             $sql = "SELECT * FROM donor";
                             $result = mysqli_query($conn, $sql);
                             while ($row = mysqli_fetch_array($result)) {
+
+                                // Update donor donation date 
+                                $sql = "SELECT * FROM donation_list WHERE DonorID = $row[0] ORDER BY DonationDate DESC";
+                                $result1 = mysqli_query($conn, $sql);
+                                if (!$result1)
+                                    echo "Error: " . $sql . "<br>" . $conn->error;
+                                else {
+                                    if ($donationList = mysqli_fetch_array($result1))
+                                        $row[10] = $donationList[6];
+                                    else 
+                                        $row[10] = "0000-00-00";
+
+                                    $sql = "UPDATE donor SET LastDonation = '$row[10]' WHERE DonorID = '$row[0]'";
+                                    if (!mysqli_query($conn, $sql))
+                                        echo "Error: " . $sql . "<br>" . $conn->error;
+                                }
+
                                 echo "<tr>";
                                 echo "<td>$row[1]</td>";
                                 echo "<td>$row[2]</td>";
