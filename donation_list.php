@@ -15,7 +15,7 @@
         $result = mysqli_query($conn, $sql);
 
         if ($result) {
-            $row = mysqli_fetch_array($result);
+            $row = mysqli_fetch_array($result);`
             if ($row != NULL) {
                 $empName = $row[1];
             } else {
@@ -144,7 +144,7 @@
                         <span onclick="document.getElementById('editDonationModal').style.display='none'"
                             class="w3-button w3-display-topright"><i class="fa fa-times"></i></span>
                         <!-- !TODO -->
-                        <h2>Edit DonationList</h2>
+                        <h2>Edit Donation List</h2>
                     </header>
                     <div class="w3-container" id="editform">
                         <form class='w3-row-padding' action="" method='POST'>

@@ -53,11 +53,14 @@
                     if (!$reuslt1)
                         echo "Error: " . $sql . "<br>" . $conn->error;
                     else
+                    {
                         $donorDetails = mysqli_fetch_array($reuslt1);
+                        $sql = "UPDATE donor SET DonationFrequency = $donorDetails[11]-1 WHERE DonorID = $donorDetails[0]";
+                        if (!mysqli_query($conn, $sql))
+                        echo "Error: " . $sql . "<br>" . $conn->error;
+                    }
                 }
-                $sql = "UPDATE donor SET DonationFrequency = $donorDetails[11]-1 WHERE DonorID = $donorDetails[0]";
-                if (!mysqli_query($conn, $sql))
-                    echo "Error: " . $sql . "<br>" . $conn->error;
+                
 
                 // Delete donationList
                 $sql = "DELETE FROM donation_list WHERE DonationListID = $row[0]";
@@ -66,7 +69,7 @@
                 }
 
                 // Update donor latest donation date 
-                $sql = "SELECT * FROM donation_list WHERE DonorID = $donorDetails[0] ORDER BY DonationDate DESC";
+                $sql = "SELECT * FROM donation_list WHERE DonorID = $id ORDER BY DonationDate DESC";
                 $result2 = mysqli_query($conn, $sql);
                 if (!$result2)
                     echo "Error: " . $sql . "<br>" . $conn->error;

@@ -252,6 +252,7 @@
         }
     }
     $pdf->Ln();
+    $pdf->AddPage();
 
     // blood
     $data = array();

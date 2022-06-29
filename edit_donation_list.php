@@ -156,9 +156,6 @@
                 echo "Error: " . $sql . "<br>" . $conn->error;
         } // done
                                                                                        
-        // need to ensure each locationID have at least 2 donors, so deleting 1 entry will not delete entire detail of that locationID
-        // hmm 
-
         // Update the rest
         $sql = "UPDATE donation_list SET HemoglobinLevel=$hemoglobinLevel, FluidVolume=$fluidVolume, DonationDate='$date' WHERE DonationListID = $id";
         if (!mysqli_query($conn, $sql))

@@ -20,8 +20,8 @@
             $id = $row[0] + 1;
 
             $sql = "INSERT INTO donor(DonorID, DonorName, `DonorIC/Passport_No`, DonorWeight, DonorAge, 
-            DonorSex, DonorPhoneNo, DonorAddress, DonorEmail, DonorNationality) 
-            VALUES('$id', '$name', '$ic', '$weight', '$age', '$sex', '$phone', '$address', '$email', '$nationality')";
+            DonorSex, DonorPhoneNo, DonorAddress, DonorEmail, DonorNationality, BloodType) 
+            VALUES('$id', '$name', '$ic', '$weight', '$age', '$sex', '$phone', '$address', '$email', '$nationality', '$bloodtype')";
             if(!mysqli_query($conn, $sql)){
                 echo "Error: " . $sql . "<br>" . $conn->error;
             }
