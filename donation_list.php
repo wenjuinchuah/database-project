@@ -15,7 +15,7 @@
         $result = mysqli_query($conn, $sql);
 
         if ($result) {
-            $row = mysqli_fetch_array($result);`
+            $row = mysqli_fetch_array($result);
             if ($row != NULL) {
                 $empName = $row[1];
             } else {
